@@ -16,6 +16,20 @@ Of course I didn't write the ConvRNN in the repo because I didn't find the pytor
 ## Cluster and Graph Pooling
 ![](src/GraphConstruction.jpg)
 
+Four types of graph cluster methods are introduced in the paper. Here are some implemenatations of these concepts.
+
+```py
+def affinities_and_thresholds(self, nodes, row, col):
+    # Norm of difference for every node pair on grid
+    edge_affinities = torch.linalg.norm(nodes[row] - nodes[col],dim = 1) 
+
+    # Inverse mean affinities for each node to threshold each edge with
+    inv_mean_affinity = scatter_mean(edge_affinities, row.to(nodes.device))
+    affinity_thresh   = torch.min(inv_mean_affinity[row],
+                                      inv_mean_affinity[col])
+    return edge_affinities.to(device), affinity_thresh.to(device), {}
+```
+
 The `jnp.einsum` op provides a DSL-based unified interface to matmul and
 tensordot ops.
 This `einshape` library is designed to offer a similar DSL-based approach
