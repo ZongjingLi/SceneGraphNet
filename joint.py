@@ -1,14 +1,14 @@
-from melkor import *
+from mifafa import *
 from config import *
 
 import datasets
 from tqdm import tqdm
 
-morgoth = Morgoth(config)
-morgoth = torch.load("mk.ckpt")
+psgnet = Mifafa(config)
+psgnet = torch.load("checkpoints/qtrmc128.ckpt")
 dataset = datasets.SpriteQA()
 trainloader = torch.utils.data.DataLoader(dataset,batch_size = 1,shuffle = True)
-optimizer = torch.optim.Adam(morgoth.parameters(), lr = 2e-4)
+optimizer = torch.optim.Adam(psgnet.parameters(), lr = 2e-4)
 
 history = []
 
@@ -25,12 +25,12 @@ while True:
         programs = sample["program"]
         answers  = sample["answer"]
 
-        outputs = morgoth.scene_perception(ims) # parser the image and other things
+        outputs = psgnet.scene_perception(ims) # parser the image and other things
 
         working_programs = [p[0] for p in programs]
         working_answers  = [a[0] for a in answers]
 
-        ground_answers = morgoth.joint_reason(working_programs,cast = False)
+        ground_answers = psgnet.joint_reason(working_programs,cast = False)
 
         recons = outputs["recons"];all_losses = outputs["losses"]
         for i,pred_img in enumerate(recons):
@@ -56,7 +56,7 @@ while True:
         total_loss += working_loss.detach()
         #sys.stdout.write("\rLoss {} " .format(working_loss.detach()))
         
-    torch.save(morgoth,"mk.ckpt")
+    torch.save(psgnet,"mk.ckpt")
     history.append(total_loss)
     print(1.0 * acc_count/total_count,total_loss)
     plt.cla()
