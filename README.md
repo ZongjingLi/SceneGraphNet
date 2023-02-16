@@ -1,7 +1,11 @@
 # Physical Scene Graph Network
-This repo is trying to reproduce the project "Learning Physical Graph Representations from Visual Scenes"
+This repo is trying to reproduce the project "Learning Physical Graph Representations from Visual Scenes". 
+
 [[Paper]](https://arxiv.org/pdf/1904.11694.pdf)
 [[Project Page]](https://sites.google.com/view/neural-logic-machines)
+
+## Cluster and Graph Pooling
+![](src/GraphConstruction.jpg)
 
 The `jnp.einsum` op provides a DSL-based unified interface to matmul and
 tensordot ops.
