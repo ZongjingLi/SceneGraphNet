@@ -6,6 +6,8 @@ Computer vision researchers have not yet developed algorithms that capture human
 [[Paper]](https://arxiv.org/pdf/1904.11694.pdf)
 [[Project Page]](https://sites.google.com/view/neural-logic-machines)
 
+When we look at a scene we see distinct object imbued with *physical properties*: color, texture, location, shape, motion, and so on. We also infer complex and dynamical relationships within the scene: a cup may be balanced precariously on table's edge, a piece of debris may be rolling in front of a truck, or a dog may have temporarily disappeared behind a tree. All of these judgements involve physical understanding of out visual observations.
+
 ## Representation of Physical Scene Graph
 ![PhysicalSceneGraph](/src/PSGs.jpg)
 The need to understand physical objects suggests a different type of scene representation than the image-like layers of features found in CNNs. Instead, different objects might be represented by distinct entities with associated attributes and interelationships--in other words, a graph representation. We formalize this idea as a Physical Scene Graph (PSG): a hierarchical graph in which nodes represent objects or their parts, edges represent relationships, and a vector of physically meaningful attributes is bound to each node,
