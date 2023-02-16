@@ -1,8 +1,16 @@
 # Physical Scene Graph Network
-This repo is trying to reproduce the project "Learning Physical Graph Representations from Visual Scenes". 
+This repo is trying to reproduce the project "Learning Physical Graph Representations from Visual Scenes". Apply Gestalt principles in unsupervised 
+visual scene understanding.
 
 [[Paper]](https://arxiv.org/pdf/1904.11694.pdf)
 [[Project Page]](https://sites.google.com/view/neural-logic-machines)
+
+## Representation of Physical Scene Graph
+![Physical Scene Graph](/src/PSGs.jpg)
+
+## Visual Feature Extraction
+![](src/ConvRNN.jpg)
+Of course I didn't write the ConvRNN in the repo because I didn't find the pytorch version for this network. I used a residual dense network to replace the feature extractor and it looks fine.
 
 ## Cluster and Graph Pooling
 ![](src/GraphConstruction.jpg)
