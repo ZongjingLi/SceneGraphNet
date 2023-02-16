@@ -6,7 +6,7 @@ visual scene understanding.
 [[Project Page]](https://sites.google.com/view/neural-logic-machines)
 
 ## Representation of Physical Scene Graph
-![Physical Scene Graph](/src/PSGs.jpg)
+![PhysicalSceneGraph](/src/PSGs.jpg)
 
 ## Visual Feature Extraction
 ![](src/ConvRNN.jpg)
