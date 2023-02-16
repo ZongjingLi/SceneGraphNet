@@ -101,6 +101,9 @@ Some examples:
 ## Graph Node Render
 This paper use the quadratic texture rendering and quadratic shape rendering to output the reconstruction signal and segmentation signal. In this repo, after each layer' nodes' attributes are calculated, we implement a fully connected network to decode the parameters for the final rendering.
 
+## Results
+Here are some results collected in the scene.
+
 ## Usage
 
 Jax version:
