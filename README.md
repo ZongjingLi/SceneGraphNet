@@ -98,6 +98,9 @@ Some examples:
 * `einshape("mnhwc->(mn)hwc", x)` is equivalent to a reshape combining
   the two leading dimensions
 
+## Graph Node Render
+This paper use the quadratic texture rendering and quadratic shape rendering to output the reconstruction signal and segmentation signal. In this repo, after each layer' nodes' attributes are calculated, we implement a fully connected network to decode the parameters for the final rendering.
+
 ## Usage
 
 Jax version:
