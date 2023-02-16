@@ -18,7 +18,7 @@ Of course I didn't write the ConvRNN in the repo because I didn't find the pytor
 
 Four types of graph cluster methods are introduced in the paper. Here are some implemenatations of these concepts.
 
-This is the implementation for the principle-1 of visual grouping. 
+**Principle-1**This is the implementation for the principle-1 of visual grouping. 
 ```py
 def affinities_and_thresholds(self, nodes, row, col):
     # Norm of difference for every node pair on grid
@@ -31,7 +31,7 @@ def affinities_and_thresholds(self, nodes, row, col):
     return edge_affinities.to(device), affinity_thresh.to(device), {}
 ```
 
-This is the implementation for the principle-2 for visual grouping. This layer corresponds to the gestalt principle of statistical cooccruence.
+**Principle-2**This is the implementation for the principle-2 for visual grouping. This layer corresponds to the gestalt principle of statistical cooccruence.
 ```py
 self.node_pair_vae = VAE( in_features=node_feat_size ,beta = 30) # layer specified
 
