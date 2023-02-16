@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 from psgnet import *
 import datasets
 
-tf_records_path = '/Users/melkor/Documents/GitHub/PSGNet/datasets/objects_room_train.tfrecords'
+tf_records_path = '/datasets/objects_room_train.tfrecords'
 
 batch_size = 1
 imsize     = 128
@@ -32,7 +32,6 @@ model_name = "phase_vision"
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 # Create train dataloader 
-tf_records_path = '/Users/melkor/Documents/GitHub/PSGNet/datasets/objects_room_train.tfrecords'
 
 dataset = datasets.Tetrominoes()
 
@@ -42,18 +41,16 @@ dataset = datasets.BattlecodeImageData()
 dataset = datasets.SpriteData()
 dataset = datasets.MixSpriteData()
 
-dataset1 = datasets.MineClip()#BattlecodeImageData()
+dataset1 = datasets.MineClip()
 dataset2 = datasets.MineOut()
 dataset3 = datasets.MineCrazy()
 
 
 dataset = torch.utils.data.ConcatDataset([dataset1,dataset2,dataset3])
 
-dataset = datasets.StaticPhase("train")
 train_dataloader = torch.utils.data.DataLoader(dataset,batch_size = batch_size, shuffle = True)
 
-#dataset = datasets.dataset(tf_records_path, 'train')
-#train_dataloader = dataset.batch(batch_size)
+
 
 # Should move these two functions below to another file
 
@@ -213,6 +210,5 @@ while True:
 
           iter_ += 1
         
-        #except:print("Wrong Execution")
-        
+
     epoch += 1

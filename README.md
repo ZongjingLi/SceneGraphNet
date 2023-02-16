@@ -1,2 +1,1 @@
-# Morgoth
- Morgoth Bauglir
+# Physical Scene Graph Network
