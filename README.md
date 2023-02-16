@@ -7,7 +7,7 @@ visual scene understanding.
 
 ## Representation of Physical Scene Graph
 ![PhysicalSceneGraph](/src/PSGs.jpg)
-
+The need to understand physical objects suggests a different type of scene representation than the image-like layers of features found in CNNs. Instead, different objects might be represented by distinct entities with associated attributes and interelationships--in other words, a graph representation. We formalize this idea as a Physical Scene Graph (PSG): a hierarchical graph in which nodes represent objects or their parts, edges represent relationships, and a vector of physically meaningful attributes is bound to each node,
 ## Visual Feature Extraction
 ![](src/ConvRNN.jpg)
 Of course I didn't write the ConvRNN in the repo because I didn't find the pytorch version for this network. I used a residual dense network to replace the feature extractor and it looks fine.
