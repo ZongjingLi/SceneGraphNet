@@ -18,6 +18,7 @@ Of course I didn't write the ConvRNN in the repo because I didn't find the pytor
 
 Four types of graph cluster methods are introduced in the paper. Here are some implemenatations of these concepts.
 
+This is the implementation for the principle-1 of visual grouping. 
 ```py
 def affinities_and_thresholds(self, nodes, row, col):
     # Norm of difference for every node pair on grid
@@ -28,6 +29,20 @@ def affinities_and_thresholds(self, nodes, row, col):
     affinity_thresh   = torch.min(inv_mean_affinity[row],
                                       inv_mean_affinity[col])
     return edge_affinities.to(device), affinity_thresh.to(device), {}
+```
+
+This is the implementation for the principle-2 for visual grouping. This layer corresponds to the gestalt principle of statistical cooccruence.
+```py
+    def affinities_and_thresholds(self, x, row, col):
+
+        # Affinities as function of vae reconstruction of node pairs
+        #_, recon_loss, kl_loss = self.node_pair_vae( torch.abs(x[row]-x[col]) )
+        _, recon_loss, kl_loss = self.node_pair_vae( x[row] - x[col] )
+        edge_affinities = 1/(1 + self.v2*recon_loss)
+
+        losses = {"recon_loss":recon_loss.mean(), "kl_loss":kl_loss.mean()}
+
+        return edge_affinities, .5, losses
 ```
 
 The `jnp.einsum` op provides a DSL-based unified interface to matmul and
