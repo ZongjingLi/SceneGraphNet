@@ -33,16 +33,17 @@ def affinities_and_thresholds(self, nodes, row, col):
 
 This is the implementation for the principle-2 for visual grouping. This layer corresponds to the gestalt principle of statistical cooccruence.
 ```py
-    def affinities_and_thresholds(self, x, row, col):
+self.node_pair_vae = VAE( in_features=node_feat_size ,beta = 30) # layer specified
 
-        # Affinities as function of vae reconstruction of node pairs
-        #_, recon_loss, kl_loss = self.node_pair_vae( torch.abs(x[row]-x[col]) )
-        _, recon_loss, kl_loss = self.node_pair_vae( x[row] - x[col] )
-        edge_affinities = 1/(1 + self.v2*recon_loss)
+def affinities_and_thresholds(self, x, row, col):
 
-        losses = {"recon_loss":recon_loss.mean(), "kl_loss":kl_loss.mean()}
+    # Affinities as function of vae reconstruction of node pairs
+    _, recon_loss, kl_loss = self.node_pair_vae( x[row] - x[col] )
+    edge_affinities = 1/(1 + self.v2*recon_loss)
 
-        return edge_affinities, .5, losses
+    losses = {"recon_loss":recon_loss.mean(), "kl_loss":kl_loss.mean()}
+
+    return edge_affinities, .5, losses
 ```
 
 The `jnp.einsum` op provides a DSL-based unified interface to matmul and
