@@ -18,6 +18,43 @@ Of course I didn't write the ConvRNN in the repo because I didn't find the pytor
 ## Cluster and Graph Pooling
 ![](src/GraphConstruction.jpg)
 
+The general framework for the graph pooling and clustering layer is here. Different layers have different kinds of grouping mechansim that corresponds to gestalt principles which will be discussed in detail later.
+
+```py
+def forward(self, x, edge_index, batch, device=device):
+    row, col = edge_index
+    # Collect affinities/thresholds to filter edges 
+
+    affinities, threshold, losses = self.affinities_and_thresholds(x,row,col)
+
+    if self.Type == "P1":filtered_edge_index = edge_index[:, affinities <= threshold]
+    if self.Type == "P2":filtered_edge_index = edge_index[:, affinities >= threshold]
+            
+    # Coarsen graph with filtered adj. list to produce next level's nodes
+    x = x.to(device)
+
+    if x.size(0) != 0:
+        try:
+            node_labels    = LP_clustering(x.size(0), filtered_edge_index, 40).to(device)
+        except:
+            node_labels = torch.arange(x.size(0))
+    else:
+        node_labels = torch.arange(x.size(0))
+        
+
+    cluster_labels = node_labels.unique(return_inverse=True,sorted=False)[1].to(device)
+
+    coarsened_x, coarsened_batch = max_pool_x(cluster_labels, x, batch)
+
+    # [Very Suceptible Step, Why use this way to coarse edges]
+    coarsened_edge_index = coalesce(cluster_labels[filtered_edge_index],
+                              None, coarsened_x.size(0), coarsened_x.size(0))[0]
+
+    return (coarsened_x, coarsened_edge_index, coarsened_batch,
+                                                         cluster_labels, losses)
+```
+
+
 Four types of graph cluster methods are introduced in the paper. Here are some implemenatations of these concepts.
 
 **Principle-1**:This is the implementation for the principle-1 of visual grouping. 
