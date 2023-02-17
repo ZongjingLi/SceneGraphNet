@@ -53,7 +53,53 @@ def forward(self, x, edge_index, batch, device=device):
     return (coarsened_x, coarsened_edge_index, coarsened_batch,
                                                          cluster_labels, losses)
 ```
+To construct new parent edges, nodes are clustered according to within-layer
+edges from one of the four affinity functions using the standard Label Propagation (LP) algorithm [44]
+(Fig. S1 left, middle column.) This algorithm takes as input only the edges El
+, the number of nodes at
+the current graph level |Vl
+|, and a parameter setting the number of iterations. Each node is initialized
+to belong in its own cluster, giving a set of labels [|Vl
+|]. Then for q > 0, iteration-q labels are
+produced from iteration q − 1-labels by assigning to each node v ∈ Vl
+the most common stage-q − 1
+label among nodes connected to v by an edge. Ties are resolved randomly. Let Pl
+: Vl → [m] denote
+the final converged label-prop assignment of nodes in V to cluster identities, where m is the number
+of clusters discovered. Effectively, the new child-to-parent edges Pl define input-dependent pooling
+kernels for Vl (Fig. S1 Left, right column.) The final stage of building a new PSG level, Graph
+Vectorization, uses these pooling kernels to aggregate statistics over the resulting partition of Vl
+,
+resulting in new nodes Vl+1 with |Vl+1| = m (see below.)
+```py
+def LP_clustering(num_nodes,edge_index,num_iter=50,device=device):
 
+    # Sparse adjacency matrix
+    adj_t = SparseTensor(row=edge_index[0], col=edge_index[1],value = torch.ones_like(edge_index[1]).float(),
+                         sparse_sizes=(num_nodes, num_nodes)).t().to(device)
+
+    # Each node starts with its index as its label
+    x = SparseTensor.eye(num_nodes).to(device)
+
+    for _ in range(num_iter):
+
+
+        # Add each node's neighbors' labels to its list of neighbor nodes
+        #row,col,v = adj_t.coo()
+        #out = torch_sparse.spmm(adj_t,x)
+        out = adj_t @ x
+        # Argmax of each row to assign new label to each node
+        row, col, value = out.coo()
+
+        argmax = scatter_max(value, row, dim_size=num_nodes)[1]
+
+        new_labels = col[argmax]
+        x = SparseTensor(row=torch.arange(num_nodes).to(device), col=new_labels,
+                            sparse_sizes=(num_nodes, num_nodes),
+                            value=torch.ones(num_nodes).to(device))
+
+    return new_labels
+```
 
 Four types of graph cluster methods are introduced in the paper. Here are some implemenatations of these concepts.
 
@@ -117,6 +163,19 @@ Give the node attributes of layer of a PSG, together with the spatial registrati
 ```math
 qtr(i,j) = a+a_h(i-c^v_h)+a_w(j-c^v_w)+\frac{1}{2}a_{hh}(i-c^v_h)^2+\frac{1}{2}a_{ww}(j-c^v_h)^2+\frac{1}{2}(i-c^v_h)(j-c^v_h).
 ```
+implementation of this paint by numbers is shown here.
+```py
+def QTR(grid,center,a,ah,aw,ahh,aww,ahw):
+    ch,cw = center
+    mx,my = grid[:,:,0],grid[:,:,1]
+    var = a + \
+        ah*(mx - ch) + aw*(my - cw) +\
+        ahh*(mx - ch)**2 + aww*(my - cw)**2 + \
+            ahw * (mx - ch) * (my - cw)
+    return var
+
+```
+
 **Quadratic Shape Rendering**
 We define quadratic shape rendering (QSR) to produce a shape from node attributes, elaborating a procedure developed in previous papers, given parameters $p^d_x,p^d_y,p^d_{\rho},p^d_{\alpha}$. Let
 ```math
