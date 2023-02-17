@@ -58,6 +58,17 @@ def forward(self, x, edge_index, batch, device=device):
 Four types of graph cluster methods are introduced in the paper. Here are some implemenatations of these concepts.
 
 **Principle-1**:This is the implementation for the principle-1 of visual grouping. 
+
+An affinity function differs from the original paper is applied in this repo. In this repo, we calculate the norm of differences between a pair of nodes and determines whether connect this pair by looking at the mean difference of a certain window (3 or 5). Let $v = A_l(v)$ denote the attribute vector associated with node $v$ at graph level $l$ (without the time-index and spatial features like centroids and moments). The the P1 affinity between two nodes $v,w$ is the reciprocal of their $L_2$ distance, gated by a binary spatial window
+```math
+D^1(v,w) = \frac{1(|c(v) - c(w)| < \delta)}{||v-w||_2}
+```
+where $c(v)$ is the centroid of node $v$ in $(i,j)$ coordinates given by its spatial window registration and $|\dot|_m$ denotes Manhattan distance in the feature grid. The P1 affinities are thresholded by the reciprocal of their local averages,
+```math
+\epsilon^1(D^1(v),D^1(w)) = \min(\frac{1}{\overline{D}^1(v)},\frac{1}{\overline{D}^1(w)})
+```
+The principle produce edges between nodes in the spatial window that has feature difference smaller than or equal to average feature differences.
+
 ```py
 def affinities_and_thresholds(self, nodes, row, col):
     # Norm of difference for every node pair on grid
@@ -68,14 +79,6 @@ def affinities_and_thresholds(self, nodes, row, col):
     affinity_thresh   = torch.min(inv_mean_affinity[row],
                                       inv_mean_affinity[col])
     return edge_affinities.to(device), affinity_thresh.to(device), {}
-```
-An affinity function differs from the original paper is applied in this repo. In this repo, we calculate the norm of differences between a pair of nodes and determines whether connect this pair by looking at the mean difference of a certain window (3 or 5). Let $v = A_l(v)$ denote the attribute vector associated with node $v$ at graph level $l$ (without the time-index and spatial features like centroids and moments). The the P1 affinity between two nodes $v,w$ is the reciprocal of their $L_2$ distance, gated by a binary spatial window
-```math
-D^1(v,w) = \frac{1(|c(v) - c(w)| < \delta)}{||v-w||_2}
-```
-where $c(v)$ is the centroid of node $v$ in $(i,j)$ coordinates given by its spatial window registration and $|\dot|_m$ denotes Manhattan distance in the feature grid. The P1 affinities are thresholded by the reciprocal of their local averages,
-```math
-\epsilon^1(D^1(v),D^1(w)) = \min(\frac{1}{\overline{D}^1(v)},\frac{1}{\overline{D}^1(w)})
 ```
 
 **Principle-2**:This is the implementation for the principle-2 for visual grouping. This layer corresponds to the gestalt principle of statistical cooccruence.
