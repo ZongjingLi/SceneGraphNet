@@ -103,6 +103,8 @@ This paper use the quadratic texture rendering and quadratic shape rendering to 
 
 **Quadratic Texture Rendering**
 Give the node attributes of layer of a PSG, together with the spatial registration (spatial region) $R_l$ it corresponds, the quadratic texture rendering (**QTR**) creates a spaitial map by inpaining the value of an attribute for node $v$ onto the pixels in $R_l(v)$. However, rather than paint uniformly throughout $R_l(v)$, QTR paints quadratically. Given 6 parameters of a quadratic form $a,a_h,a_w,a_{hh},a_{ww},a_{hw}$, it paints the corresponding spatial registration using the form $a+a_h(i-c^v_h)+a_w(j-c^v_w)+\frac{1}{2}a_{hh}(i-c^v_h)^2+\frac{1}{2}a_{ww}(j-c^v_h)^2+\frac{1}{2}(i-c^v_h)(j-c^v_h)$.
+**Quadratic Shape Rendering**
+We define quadratic shape rendering (QSR) to produce a shape from node attributes, elaborating a procedure developed in previous papers, given parameters $p^d_x,p^d_y,p_d_{\rho},p^d_{\alpha}$,$d\in [D]$.
 
 ## Furture Prediction
 The key next step is to use the physical graph representation for tasks that flummox other computer algorithms - tasks that require physical understanding more than categorical knowledge. Whether an object will slide or roll, how soon two things will collide, and where to look for something hidden are problems that depeond on just the sort of scene structure and physical properties that PSGNets encoder. By learning to build structure, physical representations of scenes, we hope that PSGNets will begin to bridge the critical gap between visual perception and physical understanding.
