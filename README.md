@@ -101,6 +101,8 @@ We define quadratic shape rendering (QSR) to produce a shape from node attribute
 ```math
  qsr^d(x,y)=\sigma(p^d_{\alpha}[\cos (p^d_\rho) - x\sin(p^d_\rho) - p^d_x]^2) - [x\cos(p^d_\rho) + y\sin(p^d_\rho - p^d_y)]
 ```
+where $\sigma$ is the standard sigmoid function and the overall segmentation will be $qsr[i,j] = \min_d qsr^d(i,j)$. The equation can be interpreted as using $D$ quadratic curves to draw shapes.
+ 
 ## Furture Prediction
 The key next step is to use the physical graph representation for tasks that flummox other computer algorithms - tasks that require physical understanding more than categorical knowledge. Whether an object will slide or roll, how soon two things will collide, and where to look for something hidden are problems that depeond on just the sort of scene structure and physical properties that PSGNets encoder. By learning to build structure, physical representations of scenes, we hope that PSGNets will begin to bridge the critical gap between visual perception and physical understanding.
 ![](src/FuturePrediction.jpg)
