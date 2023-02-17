@@ -86,18 +86,7 @@ def affinities_and_thresholds(self, x, row, col):
     return edge_affinities, .5, losses
 ```
 
-The `jnp.einsum` op provides a DSL-based unified interface to matmul and
-tensordot ops.
-This `einshape` library is designed to offer a similar DSL-based approach
-to unifying reshape, squeeze, expand_dims, and transpose operations.
-
-Some examples:
-
-* `einshape("n->n111", x)` is equivalent to `expand_dims(x, axis=1)` three times
-* `einshape("a1b11->ab", x)` is equivalent to `squeeze(x, axis=[1,3,4])`
-* `einshape("nhwc->nchw", x)` is equivalent to `transpose(x, perm=[0,3,1,2])`
-* `einshape("mnhwc->(mn)hwc", x)` is equivalent to a reshape combining
-  the two leading dimensions
+These affinity functions and corresponding thresholds are 
 
 ## Graph Node Render
 This paper use the quadratic texture rendering and quadratic shape rendering to output the reconstruction signal and segmentation signal. In this repo, after each layer' nodes' attributes are calculated, we implement a fully connected network to decode the parameters for the final rendering.
@@ -112,7 +101,8 @@ The key next step is to use the physical graph representation for tasks that flu
 ![](src/FuturePrediction.jpg)
 
 ## Results
-Here are some results collected in the scene.
+Here are some results collected in the scene from the paper. Results from this repo will come out soon.
+![](src/Results.jpg)
 
 ## Usage
 
