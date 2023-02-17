@@ -89,6 +89,7 @@ e_{vw} = |v-w|
 ```math
 e'_{vw} = H_{\phi_2}(e_{vw})
 ```
+the input features are differences between node features. Another possibility for this symmetry design will be using GNN like message passing model to gain output but that is for future work. The P2 affinity of a node pair is given by the equation.
 ```math
 D^2(v,w) = \frac{1}{1 + v_2 |e_{vw} - e'_{vw}|_2}
 ```
