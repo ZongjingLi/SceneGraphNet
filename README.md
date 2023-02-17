@@ -69,7 +69,10 @@ def affinities_and_thresholds(self, nodes, row, col):
                                       inv_mean_affinity[col])
     return edge_affinities.to(device), affinity_thresh.to(device), {}
 ```
-An affinity function differs from the original paper is applied in this repo. In this repo, we calculate the norm of differences between a pair of nodes and determines whether connect this pair by looking at the mean difference of a certain window (3 or 5).
+An affinity function differs from the original paper is applied in this repo. In this repo, we calculate the norm of differences between a pair of nodes and determines whether connect this pair by looking at the mean difference of a certain window (3 or 5). Let $v = A_l(v)$ denote the attribute vector associated with node $v$ at graph level $l$ (without the time-index and spatial features like centroids and moments). The the P1 affinity between two nodes $v,w$ is the reciprocal of their $L_2$ distance, gated by a binary spatial window
+```math
+D^1(v,w) = \frac{1(|c(v) - c(w)| < \delta)}{||v-w||_2}
+```
 
 **Principle-2**:This is the implementation for the principle-2 for visual grouping. This layer corresponds to the gestalt principle of statistical cooccruence.
 ```py
@@ -102,7 +105,7 @@ We define quadratic shape rendering (QSR) to produce a shape from node attribute
  qsr^d(x,y)=\sigma(p^d_{\alpha}[\cos (p^d_\rho) - x\sin(p^d_\rho) - p^d_x]^2) - [x\cos(p^d_\rho) + y\sin(p^d_\rho - p^d_y)]
 ```
 where $\sigma$ is the standard sigmoid function and the overall segmentation will be $qsr[i,j] = \min_d qsr^d(i,j)$. The equation can be interpreted as using $D$ quadratic curves to draw shapes.
- 
+
 ## Furture Prediction
 The key next step is to use the physical graph representation for tasks that flummox other computer algorithms - tasks that require physical understanding more than categorical knowledge. Whether an object will slide or roll, how soon two things will collide, and where to look for something hidden are problems that depeond on just the sort of scene structure and physical properties that PSGNets encoder. By learning to build structure, physical representations of scenes, we hope that PSGNets will begin to bridge the critical gap between visual perception and physical understanding.
 ![](src/FuturePrediction.jpg)
