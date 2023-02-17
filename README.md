@@ -83,13 +83,15 @@ def affinities_and_thresholds(self, nodes, row, col):
 
 **Principle-2**:This is the implementation for the principle-2 for visual grouping. This layer corresponds to the gestalt principle of statistical cooccruence.
 The idea behind this layer is that if two nodes appear often in the same pairwise arrangement, it may be because they are part of an object that moves (or exists) as a coherent whole. Thus it is away of trying to infer motion-in-concert without actually observing motion, as when visual inputs are single frames. This is implemented by making $D^2_{\phi}(v,w)$ inversely proportional to the reconstruction loss of the node pair a variational autoencoder (VAE). Denote the VAE as $\phi_2$, so the that common nodes attributes pairs will tend to be reconstructed better than rare pairs. Further, to perserve the input symmetry.
-```math
+\begin{equation}
 e_{vw} = |v-w|
-
+\end{equation}
+\begin{equation}
 e'_{vw} = H_{\phi_2}(e_{vw})
-
+\end{equation}
+\begin{equation}
 D^2(v,w) = \frac{1}{1 + v_2 |e_{vw} - e'_{vw}|_2}
-```
+\end{equation}
 ```py
 self.node_pair_vae = VAE( in_features=node_feat_size ,beta = 30) # layer specified
 
