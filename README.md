@@ -168,10 +168,8 @@ implementation of this paint by numbers is shown here.
 def QTR(grid,center,a,ah,aw,ahh,aww,ahw):
     ch,cw = center
     mx,my = grid[:,:,0],grid[:,:,1]
-    var = a + \
-        ah*(mx - ch) + aw*(my - cw) +\
-        ahh*(mx - ch)**2 + aww*(my - cw)**2 + \
-            ahw * (mx - ch) * (my - cw)
+    var = a + ah*(mx - ch) + aw*(my - cw) +\
+        ahh*(mx - ch)**2 + aww*(my - cw)**2 + ahw * (mx - ch) * (my - cw)
     return var
 
 ```
