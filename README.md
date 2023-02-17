@@ -73,6 +73,10 @@ An affinity function differs from the original paper is applied in this repo. In
 ```math
 D^1(v,w) = \frac{1(|c(v) - c(w)| < \delta)}{||v-w||_2}
 ```
+where $c(v)$ is the centroid of node $v$ in $(i,j)$ coordinates given by its spatial window registration and $|\dot|_m$ denotes Manhattan distance in the feature grid. The P1 affinities are thresholded by the reciprocal of their local averages,
+```math
+\epsilon^1(D^1(v),D^1(w)) = \min(\frac{1}{\overline{D}^1(v)},\frac{1}{\overline{D}^1(w)})
+```
 
 **Principle-2**:This is the implementation for the principle-2 for visual grouping. This layer corresponds to the gestalt principle of statistical cooccruence.
 ```py
