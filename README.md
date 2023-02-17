@@ -69,6 +69,7 @@ def affinities_and_thresholds(self, nodes, row, col):
                                       inv_mean_affinity[col])
     return edge_affinities.to(device), affinity_thresh.to(device), {}
 ```
+An affinity function differs from the original paper is applied in this repo. In this repo, we calculate the norm of differences between a pair of nodes and determines whether connect this pair by looking at the mean difference of a certain window (3 or 5).
 
 **Principle-2**:This is the implementation for the principle-2 for visual grouping. This layer corresponds to the gestalt principle of statistical cooccruence.
 ```py
