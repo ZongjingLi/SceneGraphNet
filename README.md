@@ -85,7 +85,9 @@ def affinities_and_thresholds(self, nodes, row, col):
 The idea behind this layer is that if two nodes appear often in the same pairwise arrangement, it may be because they are part of an object that moves (or exists) as a coherent whole. Thus it is away of trying to infer motion-in-concert without actually observing motion, as when visual inputs are single frames. This is implemented by making $D^2_{\phi}(v,w)$ inversely proportional to the reconstruction loss of the node pair a variational autoencoder (VAE). Denote the VAE as $\phi_2$, so the that common nodes attributes pairs will tend to be reconstructed better than rare pairs. Further, to perserve the input symmetry.
 ```math
 e_{vw} = |v-w|
+
 e'_{vw} = H_{\phi_2}(e_{vw})
+
 D^2(v,w) = \frac{1}{1 + v_2 |e_{vw} - e'_{vw}|_2}
 ```
 ```py
