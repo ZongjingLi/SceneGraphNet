@@ -85,8 +85,6 @@ def LP_clustering(num_nodes,edge_index,num_iter=50,device=device):
 
 
         # Add each node's neighbors' labels to its list of neighbor nodes
-        #row,col,v = adj_t.coo()
-        #out = torch_sparse.spmm(adj_t,x)
         out = adj_t @ x
         # Argmax of each row to assign new label to each node
         row, col, value = out.coo()
