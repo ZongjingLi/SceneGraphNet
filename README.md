@@ -161,7 +161,7 @@ This paper use the quadratic texture rendering and quadratic shape rendering to 
 **Quadratic Texture Rendering**
 Give the node attributes of layer of a PSG, together with the spatial registration (spatial region) $R_l$ it corresponds, the quadratic texture rendering (**QTR**) creates a spaitial map by inpaining the value of an attribute for node $v$ onto the pixels in $R_l(v)$. However, rather than paint uniformly throughout $R_l(v)$, QTR paints quadratically. Given 6 parameters of a quadratic form $a,a_h,a_w,a_{hh},a_{ww},a_{hw}$, it paints the corresponding spatial registration using the form 
 ```math
-qtr(i,j) = a+a_h(i-c^v_h)+a_w(j-c^v_w)+\frac{1}{2}a_{hh}(i-c^v_h)^2+\frac{1}{2}a_{ww}(j-c^v_h)^2+\frac{1}{2}(i-c^v_h)(j-c^v_h).
+qtr(i,j) = a+a_h(i-c^v_h)+a_w(j-c^v_w)+\frac{1}{2}a_{hh}(i-c^v_h)^2+\frac{1}{2}a_{ww}(j-c^v_w)^2+\frac{1}{2}(i-c^v_h)(j-c^v_w).
 ```
 implementation of this paint by numbers is shown here.
 ```py
