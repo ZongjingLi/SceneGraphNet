@@ -13,6 +13,7 @@ When we look at a scene we see distinct object imbued with *physical properties*
 The need to understand physical objects suggests a different type of scene representation than the image-like layers of features found in CNNs. Instead, different objects might be represented by distinct entities with associated attributes and interelationships--in other words, a graph representation. We formalize this idea as a Physical Scene Graph (PSG): a hierarchical graph in which nodes represent objects or their parts, edges represent relationships, and a vector of physically meaningful attributes is bound to each node,
 ## Visual Feature Extraction
 ![](src/ConvRNN.jpg)
+Unlike the task of inferring scene structure, CNNS are already good at extracting geometric features - they just do not group these features into discrete objects. However, different types of geometric information are typically found in different CNN layers: early layers can encode sharp object boundaries, whereas later layers better encode board-scale information about depth and surface shape. To combine both types of information in a single set of features, we developed a recurrent CNN (ConvRNN) that learns to combine early and late layers through locally recurrent "cells" and long-range feedback connections. As expected, this recurrent feature extraction architecture is mainly cruicial for learning to represent geometric properties: lower-level visual properties, like color and texture, are laregely unaffected by instead using a feedforward CNN feature extractor.
 Of course I didn't write the ConvRNN in the repo because I didn't find the pytorch version for this network. I used a residual dense network to replace the feature extractor and it looks fine.
 
 ## Cluster and Graph Pooling
@@ -187,18 +188,6 @@ The key next step is to use the physical graph representation for tasks that flu
 Here are some results collected in the scene from the paper. Results from this repo will come out soon.
 ![](src/Results.jpg)
 
-## Usage
-
-Jax version:
-
-```py
-from einshape import jax_einshape as einshape
-from jax import numpy as jnp
-
-a = jnp.array([[1, 2], [3, 4]])
-b = einshape("ij->(ij)", a)
-# b is [1, 2, 3, 4]
-```
 
 ## Future Works
 This project contains.
