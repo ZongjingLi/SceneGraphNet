@@ -27,7 +27,7 @@ tf_records_path = '/datasets/objects_room_train.tfrecords'
 batch_size = 1
 imsize     = 128
 
-model_name = "phase_vision"
+model_name = "namomo_vision"
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
