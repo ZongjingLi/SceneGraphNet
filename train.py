@@ -27,7 +27,7 @@ tf_records_path = '/Users/melkor/Documents/datasets/objects_room_train.tfrecords
 batch_size = 1
 imsize     = 64
 
-model_name = "sprite_vision"
+model_name = "sprite64_vision"
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
