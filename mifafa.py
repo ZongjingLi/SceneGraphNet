@@ -1,81 +1,75 @@
 
-import torch
-import torch.nn as nn
+# Module performs affinity clustering on a graph and label propagation 
+# clustering to coarsen the graph
+class AffinityConditionedAggregation(torch.nn.Module, ABC):
 
-import numpy as np
-from torch_scatter import scatter_sum
+    # Takes in tensor of node pairs and returns an affinity tensor and a 
+    # threshold tensor to filter the affinites with. Also returns any loss
+    # items to pass back to the training layer as a dict.
+    # x is the list of graph nodes and row, col are the tensors of the adj. list
+    @abstractmethod
+    def affinities(self, x, row, col):
+        pass
 
-from psgnet import *
-from reason import *
+    # Filters edge index based on base method's affinity thresholding and 
+    # coarsens graph to produce next level's nodes
+    def forward(self, x, edge_index, batch, device="cuda"):
 
-def spatial_expansion(level):
-    coords  =  level.spatial_coords
-    centers =  level.centroids
-    features = level.features
-    clusters = level.clusters
-
-    # expand center to grid level
-    centers = centers[clusters]
-    spatial_features = []
-    for n in range(7):
-        spatial_features.append(scatter_mean( ((coords - centers) ** (n+1))[:,0],clusters).unsqueeze(-1))
-        spatial_features.append(scatter_mean( ((coords - centers) ** (n+1))[:,1],clusters).unsqueeze(-1))
-    spatial_features.append(scatter_sum(torch.ones_like(clusters),clusters).unsqueeze(-1)/400)
-
-    moments = torch.cat(spatial_features,dim = -1)
-
-    return moments,features
-
-class Avatar(nn.Module):
-    def __init__(self,config):
-        super().__init__()
-        self.config = config;
-
-    def forward(self,x):
-        return x
-
-class Mifafa(nn.Module):
-    def __init__(self,config):
-        super().__init__()
+        #edge_index = add_self_loops(edge_index,num_nodes=x.size(0))[0].to(device)
         
-        # [Create Visual Model]
-        node_feat_size = 32
-        if isinstance(config.visual_path,str):self.psgnet = torch.load(config.visual_path)
-        else:self.psgnet = PSGNet(config.imsize)
+        row, col = edge_index
 
-        # [Entity Projector]
-        self.entity_projector = FCBlock(128,3,node_feat_size + config.spatial_dim,config.concept_dim) #[NFS + SFS,C]
+        # Collect affinities/thresholds to filter edges 
 
-        # [Scene Joint Reasoning]
-        circle = ConceptBox("Circle","shape",dim = 100)
-        cube  = ConceptBox("Cube" ,"shape",dim = 100)
-        diamond  = ConceptBox("Diamond" ,"shape",dim = 100)
-        concepts = {"static_concepts":torch.nn.ModuleList([circle,cube,diamond]),"dynamic_concepts":[],"relations":["relations"]}
-        self.quasi_executor = QuasiExecutor(concepts)
+        affinities, losses = self.affinities(x,row,col)
+        affinities = affinities.exp()
 
-        # [Perception Level]
-        self.levels = None
-        self.context = None
-    
-    def scene_perception(self,im):
-        outputs = self.psgnet(im) # perform perception on a single image each time
-        recons, clusters, all_losses, levels = outputs["recons"],outputs["clusters"],outputs["losses"], outputs["levels"]
-        self.levels = levels
-        moments,features = spatial_expansion(levels[-1])
-        entity = cast_to_entities(self.entity_projector(torch.cat([moments,features],dim = -1)))
+        # Coarsen graph with filtered adj. list to produce next level's nodes
 
-        self.context = {"features":entity,"scores":torch.zeros([len(entity)]),"coords":levels[-1].centroids}
-        return outputs
+        node_labels    = LP_clustering(x.size(0), edge_index, affinities, 30)
+        cluster_labels = node_labels.unique(return_inverse=True,sorted=False)[1]
 
-    def joint_reason(self,questions,cast = True):
-        if isinstance(questions[0],FuncNode):
-            # questions are already functional nodes
-            programs = questions
-        else:programs = [toFuncNode(q) for q in questions]
-        context = self.context
-        if cast:answers = [regular_result(self.quasi_executor(p,context)) for p in programs]
-        else:answers = [self.quasi_executor(p,context) for p in programs]
-        return answers 
-    
-    def ground_concepts(self,questions,answers):
-        return 0
+        coarsened_x, coarsened_batch = max_pool_x(cluster_labels, x, batch)
+        coarsened_edge_index = coalesce(cluster_labels[edge_index],
+                              None, coarsened_x.size(0), coarsened_x.size(0))[0]
+
+        return (coarsened_x, coarsened_edge_index, coarsened_batch,
+                                                         cluster_labels, losses)
+
+
+class P2AffinityAggregation(AffinityConditionedAggregation):
+
+    def __init__(self, node_feat_size, v2=3.5 ):
+        super().__init__()
+        self.Type = "P2"
+        self.v2 = v2
+        self.node_pair_vae = VAE( in_features=2*node_feat_size )
+
+    # Note question to ask: why reconstructing difference of nodes versus
+    # concatenating them, as many different node pairs can have similar
+    # differences? Is it just to make it symmetric? Try both
+    # Currently using the concatenation but can switch to difference below
+    #_, recon_loss, kl_loss = self.node_pair_vae( torch.abs(x[row]-x[col]) )
+
+    def affinities(self, x, row, col):
+
+        # Affinities as function of vae reconstruction of node pairs
+        _, recon_loss, kl_loss = self.node_pair_vae( torch.cat((x[row],x[col]),dim=1) )
+        edge_affinities = 1/(1 + self.v2*recon_loss )
+
+        losses = {"recon_loss":recon_loss.mean(), "kl_loss":kl_loss.mean()}
+
+        return edge_affinities, losses
+
+class P1AffinityAggregation(AffinityConditionedAggregation):
+    def __init__(self):
+        super().__init__()
+        self.Type = "P1"
+    # P1 is a zero-parameter affinity clustering algorithm which operates on
+    # the similarity of features
+    def affinities(self, x, row, col):
+
+        # Norm of difference for every node pair on grid
+        edge_affinities = 1/(0.1+torch.linalg.norm( x[row]-x[col], dim=1).to(x.device))
+
+        return edge_affinities, {}
