@@ -50,8 +50,8 @@ dataset = torch.utils.data.ConcatDataset([dataset1,dataset2,dataset3])
 dataset = datasets.SpriteData()
 train_dataloader = torch.utils.data.DataLoader(dataset,batch_size = batch_size, shuffle = True)
 
-#dataset = datasets.dataset(tf_records_path, 'train')
-#train_dataloader = dataset.batch(batch_size)
+dataset = datasets.dataset(tf_records_path, 'train')
+train_dataloader = dataset.batch(batch_size)
 
 # Should move these two functions below to another file
 
@@ -92,13 +92,15 @@ from torch_scatter import scatter_max
 
 
 # Create model
-
+"""
 try:
-    model = torch.load("checkpoints/{}.ckpt".format(model_name),map_location = device)
+    #model = torch.load("checkpoints/{}.ckpt".format(model_name),map_location = device)
     print("QTR Model Loaded from ckpt")
 except:
     print("checkpoint is not found, creating a new instance")
-    model = PSGNet(imsize)
+"""
+
+model = PSGNet(imsize)
 
 model = model.to(device)
 model.device = device

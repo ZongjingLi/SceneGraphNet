@@ -158,7 +158,7 @@ class AffinityConditionedAggregation(torch.nn.Module, ABC):
         # Collect affinities/thresholds to filter edges 
 
         affinities, losses = self.affinities(x,row,col)
-        affinities = affinities.exp()
+        affinities = torch.sigmoid(affinities - 5)
 
         # Coarsen graph with filtered adj. list to produce next level's nodes
 
@@ -175,11 +175,11 @@ class AffinityConditionedAggregation(torch.nn.Module, ABC):
 
 class P2AffinityAggregation(AffinityConditionedAggregation):
 
-    def __init__(self, node_feat_size, v2=3.5 ):
+    def __init__(self, node_feat_size, v2=15.5 ):
         super().__init__()
         self.Type = "P2"
         self.v2 = v2
-        self.node_pair_vae = VAE( in_features=2*node_feat_size )
+        self.node_pair_vae = VAE( in_features=node_feat_size )
 
     # Note question to ask: why reconstructing difference of nodes versus
     # concatenating them, as many different node pairs can have similar
@@ -190,8 +190,8 @@ class P2AffinityAggregation(AffinityConditionedAggregation):
     def affinities(self, x, row, col):
 
         # Affinities as function of vae reconstruction of node pairs
-        _, recon_loss, kl_loss = self.node_pair_vae( torch.cat((x[row],x[col]),dim=1) )
-        edge_affinities = 1/(1 + self.v2*recon_loss )
+        _, recon_loss, kl_loss = self.node_pair_vae( torch.abs(x[row]- x[col]))
+        edge_affinities = 1/(0.001 + self.v2*recon_loss )
 
         losses = {"recon_loss":recon_loss.mean(), "kl_loss":kl_loss.mean()}
 
@@ -206,36 +206,38 @@ class P1AffinityAggregation(AffinityConditionedAggregation):
     def affinities(self, x, row, col):
 
         # Norm of difference for every node pair on grid
-        edge_affinities = 1/(0.1+torch.linalg.norm( x[row]-x[col], dim=1).to(x.device))
+        edge_affinities = 1/(0.001+torch.linalg.norm( x[row]-x[col], dim=1).to(x.device))
 
         return edge_affinities, {}
-def LP_clustering(num_nodes,edge_index,num_iter=50,device=device):
+
+# Takes in number of nodes, the graph's edge index (adj. list), number of LP
+# iterations, and returns the label for each node 
+def LP_clustering(num_nodes,edge_index,edge_weight,num_iter=10,device=device):
 
     # Sparse adjacency matrix
-    adj_t = SparseTensor(row=edge_index[0], col=edge_index[1],value = torch.ones_like(edge_index[1]).float(),
-                         sparse_sizes=(num_nodes, num_nodes)).t().to(device)
+    adj_t = SparseTensor(row=edge_index[0], col=edge_index[1],
+           sparse_sizes=(num_nodes, num_nodes),value=edge_weight).t().to(device)
 
     # Each node starts with its index as its label
     x = SparseTensor.eye(num_nodes).to(device)
 
+    # Run LP for num_iter iterations
     for _ in range(num_iter):
 
-
         # Add each node's neighbors' labels to its list of neighbor nodes
-        #row,col,v = adj_t.coo()
-        #out = torch_sparse.spmm(adj_t,x)
         out = adj_t @ x
+
         # Argmax of each row to assign new label to each node
         row, col, value = out.coo()
-
         argmax = scatter_max(value, row, dim_size=num_nodes)[1]
-
         new_labels = col[argmax]
+
         x = SparseTensor(row=torch.arange(num_nodes).to(device), col=new_labels,
                             sparse_sizes=(num_nodes, num_nodes),
                             value=torch.ones(num_nodes).to(device))
 
     return new_labels
+
 
 def QTR(grid,center,a,ah,aw,ahh,aww,ahw):
     ch,cw = center
@@ -326,7 +328,7 @@ class PSGNet(torch.nn.Module):
         # [Global Coords]
         self.global_coords = self.spatial_coords.float()
 
-        self.spatial_edges = build_perception(imsize,2,device = device)
+        self.spatial_edges = build_perception(imsize,1,device = device)
         self.spatial_coords = self.spatial_coords.to(device).float() / imsize
         # Conv. feature extractor to map pixels to feature vectors
         self.rdn = RDN(SimpleNamespace(G0=node_feat_size  ,RDNkSize=3,n_colors=3,
