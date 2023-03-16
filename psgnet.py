@@ -354,7 +354,10 @@ class PSGNet(torch.nn.Module):
 
         # Affinity modules: for now just one of P1 and P2 
         self.affinity_aggregations = torch.nn.ModuleList([
-            P1AffinityAggregation(),P2AffinityAggregation(node_feat_size),P2AffinityAggregation(node_feat_size),
+            P1AffinityAggregation(),
+            P2AffinityAggregation(node_feat_size),
+            P2AffinityAggregation(node_feat_size),
+            P2AffinityAggregation(node_feat_size),
 
         ])
 
