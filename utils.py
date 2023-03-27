@@ -230,4 +230,3 @@ grid = [[img1, flow_img] for (img1, flow_img) in zip(img1_batch, flow_imgs)]
 #plot(grid)
 """
 
-print("what the hell?")
