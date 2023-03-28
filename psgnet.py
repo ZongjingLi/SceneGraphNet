@@ -344,7 +344,7 @@ class PSGNet(torch.nn.Module):
         # [Global Coords]
         self.global_coords = self.spatial_coords.float()
 
-        self.spatial_edges = build_perception(imsize,2,device = device)
+        self.spatial_edges = build_perception(imsize,3,device = device)
         self.spatial_coords = self.spatial_coords.to(device).float() / imsize
         # Conv. feature extractor to map pixels to feature vectors
         self.rdn = RDN(SimpleNamespace(G0=node_feat_size  ,RDNkSize=3,n_colors=3,
@@ -357,7 +357,7 @@ class PSGNet(torch.nn.Module):
             P1AffinityAggregation(),
             P2AffinityAggregation(node_feat_size),
             P2AffinityAggregation(node_feat_size),
-            P2AffinityAggregation(node_feat_size),
+            #P2AffinityAggregation(node_feat_size),
 
         ])
 

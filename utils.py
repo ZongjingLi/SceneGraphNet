@@ -27,8 +27,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 from torchvision.models.optical_flow import Raft_Large_Weights
 
-weights = Raft_Large_Weights.DEFAULT
-transforms = weights.transforms()
+
 
 
 def preprocess(img1_batch, img2_batch):
