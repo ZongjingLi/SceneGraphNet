@@ -27,7 +27,7 @@ tf_records_path = '/Users/melkor/Documents/datasets/objects_room_train.tfrecords
 batch_size = 1
 imsize     = 128
 
-model_name = "mc128_level3"
+model_name = "ptr128_level3"
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -47,6 +47,7 @@ dataset3 = datasets.MineCrazy()
 dataset = torch.utils.data.ConcatDataset([dataset1,dataset2,dataset3])
 #dataset = datasets.SpriteData()
 #dataset = datasets.ToyData("train")
+dataset = datasets.PTRData("train")
 train_dataloader = torch.utils.data.DataLoader(dataset,batch_size = batch_size, shuffle = True)
 
 #dataset = datasets.dataset(tf_records_path, 'train')
@@ -93,9 +94,9 @@ from torch_scatter import scatter_max
 # Create model
 
 try:
-    #model = torch.load("checkpoints/{}.ckpt".format(model_name),map_location = device)
+    model = torch.load("checkpoints/{}.ckpt".format(model_name),map_location = device)
     print("QTR Model Loaded from ckpt")
-    model = PSGNet(imsize)
+    #model = PSGNet(imsize)
 except:
     print("checkpoint is not found, creating a new instance")
     model = PSGNet(imsize)
