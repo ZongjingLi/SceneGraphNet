@@ -187,7 +187,3 @@ The key next step is to use the physical graph representation for tasks that flu
 ## Results
 Here are some results collected in the scene from the paper. Results from this repo will come out soon.
 ![](src/Results.jpg)
-
-
-## Future Works
-This project contains.
