@@ -25,14 +25,14 @@ import datasets
 tf_records_path = '/Users/melkor/Documents/datasets/objects_room_train.tfrecords'
 
 batch_size = 1
-imsize     = 64
+imsize     = 128
 
 model_name = "toy128_level3"
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 # Create train dataloader 
-
+"""
 
 dataset = datasets.Clevr4()
 dataset = datasets.BattlecodeImageData()
@@ -48,10 +48,18 @@ dataset = torch.utils.data.ConcatDataset([dataset1,dataset2,dataset3])
 #dataset = datasets.SpriteData()
 #dataset = datasets.ToyData("train")
 #dataset = datasets.PTRData("train")
+"""
+local = not torch.cuda.is_available()
+syq_path = "/Users/melkor/Documents/datasets"
+wys_path = "/data3/guofang/Meta/Benchmark/MultiPaperQA/wys_try/datasets"
+dataset_dir = syq_path if local else wys_path
+
+resolution = (128,128)
+dataset = dataset = datasets.TDWRoomDataset(name = "TDWKitchen",resolution = resolution, root_dir = dataset_dir, split = "train")
 train_dataloader = torch.utils.data.DataLoader(dataset,batch_size = batch_size, shuffle = True)
 
-dataset = datasets.dataset(tf_records_path, 'train')
-train_dataloader = dataset.batch(batch_size)
+#dataset = datasets.dataset(tf_records_path, 'train')
+#train_dataloader = dataset.batch(batch_size)
 
 # Should move these two functions below to another file
 
@@ -88,7 +96,6 @@ def log_imgs(pred_img,clusters,gt_img,iter_):
 
 from torch_sparse import SparseTensor
 from torch_scatter import scatter_max
-
 
 
 # Create model
@@ -134,7 +141,7 @@ loss_history = []
 while True:
     for model_input in train_dataloader:
         
-          gt_img = torch.tensor(model_input["image"].numpy()).float().to(device)/255
+          gt_img = torch.tensor(model_input["img"].numpy()).float().to(device).permute(0,2,3,1)
 
 
           optimizer.zero_grad()

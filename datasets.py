@@ -434,3 +434,42 @@ class PTRData(Dataset):
 
     def __len__(self):
         return 500 #len(self.ptr_data)
+    
+
+def normal_img(img):
+    if len(img.shape) == 4:
+        if not img.shape[1] in [1,3,4]: return img.permute(0,3,1,2)
+    if len(img.shape) == 3:
+        if not img.shape[0] in [1,3,4]: return img.permute(2,0,1)
+
+class TDWRoomDataset(Dataset):
+    def __init__(self,name="TDWRoom", split = "train", resolution = (128,128), root_dir = "datasets"):
+        super().__init__()
+        self.split = split
+        self.root_dir = root_dir + f"/{name}"
+
+        img_data_path = root_dir + f"/{name}"+ f"/{split}/img"
+        self.files = os.listdir(img_data_path)
+
+        """ add a working resolution to adapt different scenes and parameters"""
+        self.transform = transforms.Resize(resolution)
+    
+    def __len__(self):
+        return 700#len(self.files) // 4
+    
+    def __getitem__(self, idx):
+        root_dir = self.root_dir
+        split = self.split
+        img_data_path = root_dir + f"/{self.split}/img"
+
+        data = {}
+        img = torch.tensor(plt.imread(img_data_path + f"/img_{idx}.png"))
+        albedo = torch.tensor(plt.imread(img_data_path + f"/albedo_{idx}.png"))
+        masks = np.load(img_data_path + f"/mask_{idx}.npy")
+        #masks = torch.tensor(plt.imread(img_data_path + f"/id_{split}_{idx}.png"))
+        
+
+        data["img"] = self.transform(normal_img(img))
+        data["albedo"] = self.transform(normal_img(albedo))
+        data["masks"] =self.transform(torch.tensor(masks).unsqueeze(0)).squeeze(0)
+        return data
