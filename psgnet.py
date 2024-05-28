@@ -389,9 +389,6 @@ class PSGNet(torch.nn.Module):
         self.gauge = nn.Linear(node_feat_size,node_feat_size)
 
 
-    def dforward(self,imgs,effective_mask = None):
-        return 0
-
     def forward(self,img,effective_mask = None):
         batch_size = img.shape[0]
 
